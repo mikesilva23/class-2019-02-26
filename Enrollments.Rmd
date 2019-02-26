@@ -5,3 +5,29 @@ date: "2/26/2019"
 output: html_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(readxl)
+library(tidyverse)
+library(janitor)
+```
+
+```{r}
+
+x.2018 <- read_xlsx("class_enrollment_summary_by_term_03.06.18.xlsx", skip= 3) %>%
+  clean_names() %>%
+  filter(! is.na(course_name)) %>%
+  select(course_id, course_title, course_name, u_grad)
+
+x.2019 <- read_xlsx("class_enrollment_summary_by_term_2.26.19.xlsx", skip= 3) %>%
+  clean_names() %>% 
+  filter(! is.na(course_name)) %>%
+  select(course_id, course_title, course_name, u_grad)
+
+x.combo <- inner_join(x.2018, x.2019, by= "course_id", suffix = c(".2019", ".2018")) %>%
+ select(course_title.2019, course_name.2019 ,u_grad.2018, u_grad.2019) %>% 
+ mutate(Change= u_grad.2018 - u_grad.2019) %>%
+arrange(Change)
+
+x.combo
+```
